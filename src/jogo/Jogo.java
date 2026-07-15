@@ -56,13 +56,13 @@ public class Jogo {
     }
     
     private static void jogarPartida(int percepcao){
+        int temp;
         Combate combate = new Combate();
         Mapa mapa = new Mapa(10);
         mapa.gerar(percepcao);
+        Player player = mapa.getPlayer();
         
         System.out.println("-----------------------------------------");
-        List<Personagem> personagens = mapa.getPersonagens();
-        Player player = (Player) personagens.get(0);
         
         boolean debug = false;
         boolean jogoEmAndamento = true;
@@ -90,10 +90,12 @@ public class Jogo {
                     }
                     break;
                 case 2:
-                    if(player.usarKitMedico()){
-                        System.out.println("Você usou um Kit Médico e recuperou pontos de vida!");
+                    temp = player.getInventario().procurarItem(1);
+                    if ( temp == -1 ) {
+                        System.out.println("Não há kit médicos no inventário ");
+                        break;
                     } else {
-                        System.out.println("Você não possui Kit Médico!");
+                        player.getInventario().getInventario().get(temp).usarItem(player);
                     }
                     break;
                 case 3:
@@ -121,11 +123,11 @@ public class Jogo {
         
         Entidade entidade = mapa.moverPlayer(player, escolha);
         
-        if(entidade != null && !entidade.getNome().equals("Parede")){
+        if(mapa.isDinossauro(entidade)){
             int resultado = combate.iniciarCombate(player, (Dinossauro) entidade, mapa);
             
             if(resultado == Combate.VITORIA){
-                mapa.setCelula(entidade.getX(), entidade.getY(), null);
+                mapa.matarDinossauro((Dinossauro) entidade);
                 mapa.moverPlayer(player, escolha);
             }
             
@@ -138,12 +140,10 @@ public class Jogo {
     }
     
     private static boolean existemDinossauros(Mapa mapa){
-        for(Personagem p : mapa.getPersonagens()){
-            if(p instanceof Dinossauro && p.estaVivo()){
-                return true;
-            }
+        if ( mapa.getListaDinossauros().isEmpty() ) {
+            return false;
         }
-        return false;
+        return true;
     }
     
     private static void exibirResultadoFinal(Player player, Mapa mapa){

@@ -4,11 +4,9 @@ import jogo.Mapa;
 
 public class TRex extends Dinossauro{
     public TRex(int x, int y){
-        super("T-Rex", x, y, 'R', 3);
+        super("T-Rex", x, y, 'R', 3, 4);
     }
-    @Override
-    public void mover(int x, int y, Mapa mapa) {
-    }
+
     
     @Override
     public void atacar(Personagem alvo, int dano){

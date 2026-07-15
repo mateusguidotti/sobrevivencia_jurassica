@@ -4,14 +4,16 @@ import interfaces.Movel;
 import jogo.Mapa;
 
 public abstract class Dinossauro extends Personagem {
+    int id;
 
-    public Dinossauro(String nome, int x, int y, char simbolo, int vida) {
+    public Dinossauro(String nome, int x, int y, char simbolo, int vida, int id) {
         super(nome, x, y, simbolo, vida);
+        this.id = id;
     }
 
     @Override
     public void atacar(Personagem alvo, int dano) {
-        alvo.tomarDano(1);
+        alvo.tomarDano(dano);
     }
 
     
@@ -24,13 +26,9 @@ public abstract class Dinossauro extends Personagem {
         return true;
     }
 
-    public int getPassosMovimento() {
-        return 1;
-    }
 
     public boolean perseguePersonagem() {
         return false;
     }
 
-    public abstract void mover(int i, int i0, Mapa aThis);
 }

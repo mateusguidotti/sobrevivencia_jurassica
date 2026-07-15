@@ -1,61 +1,74 @@
 package jogo;
 
+import itens.Arma;
+import itens.Item;
+import java.util.ArrayList;
+import java.util.List;
+import personagens.Personagem;
+
 public class Inventario {
-    private boolean bastao;
-    private int dardos;
-    private int kitsMedicos;
+    private List<Item> inventario = new ArrayList<>();
+    private List<Arma> armas = new ArrayList<>();
     
-    public Inventario(){
-        bastao = false;
-        dardos = 0;
-        kitsMedicos = 0;
-    }
-    
-    public void setBastao(boolean valor){
-        bastao = valor;
-    }
-    
-    public boolean temBastao(){
-        return bastao;
-    }
-    
-    public void adicionarDardo(){
-        dardos++;
-    }
-    
-    public boolean temDardos(){
-        return dardos > 0;
-    }
-    
-    public int getDardos(){
-        return dardos;
-    }
-    
-    public boolean usarDardo(){
-        if(dardos > 0){
-            dardos--;
-            return true;
+    public void pegarItem ( Item item ) {
+        if ( item.isArma() ) {
+            for ( Arma arma : armas ) {
+                if ( arma.getId() == item.getId() ) {
+                    arma.receberItem();
+                    return;
+                }
+            }
+            armas.add((Arma) item);
+        } else {
+            for ( Item itemTemp : inventario ) {
+                if ( itemTemp.getId() == item.getId() ) {
+                    item.receberItem();
+                    return;
+                }
+            }
+            inventario.add(item);
         }
-        return false;
+    }
+    public void addItem ( Item item ) {
+        inventario.add(item);
+    }
+    public void addArma ( Arma arma ) {
+        armas.add(arma);
+    }
+    public int procurarItem ( int id ) {
+        for ( int i = 0; i < inventario.size(); i++ ) {
+            if ( id == inventario.get(i).getId() ) {
+                return i;
+            }
+         }
+        return -1;
+    }
+
+    public List<Item> getInventario() {
+        return inventario;
     }
     
-    public void adicionarKitMedico(){
-        kitsMedicos++;
+    public List<Arma> getArmas ( ) {
+        return armas;
     }
     
-    public boolean temKitMedico(){
-        return kitsMedicos > 0;
-    }
-    
-    public int getKitsMedicos(){
-        return kitsMedicos;
-    }
-    
-    public boolean usarKitMedico(){
-        if(kitsMedicos > 0){
-            kitsMedicos--;
-            return true;
+    public void removerItem ( Item item ) {
+        if ( !inventario.contains(item) ) {
+            throw new IllegalArgumentException("Item não contido na lista");
         }
-        return false;
+        item.gastarItem();
+        if ( item.getQuantidade() <= 0 ) {
+            inventario.remove(item);
+        }
     }
+    public void removerArma ( Arma arma ) {
+        if ( !armas.contains(arma) ) {
+            throw new IllegalArgumentException ( "Item não contido na lista" );
+        }
+        arma.gastarItem();
+        if ( arma.getQuantidade() <= 0 ) {
+            armas.remove(arma);
+        }
+    }
+    
 }

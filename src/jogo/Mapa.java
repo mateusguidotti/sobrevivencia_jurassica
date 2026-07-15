@@ -1,5 +1,10 @@
 package jogo;
 
+import interfaces.Movel;
+import itens.Arma;
+import itens.ArmaDeDardos;
+import itens.BastaoChoque;
+import itens.KitMedico;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -9,6 +14,15 @@ public class Mapa {
     private int tamanho;
     private Entidade[][] celulas;
     private Random random;
+    private Player player;
+    private List<Movel> moveis = new ArrayList<>();
+    private List<Dinossauro> dinos = new ArrayList<>();
+    private List<CaixaSuprimento> caixas = new ArrayList<>();
+    private List<Parede> paredes = new ArrayList<>();
+    
+    public List<Dinossauro> getListaDinossauros() {
+        return dinos;
+    }
     
     public Mapa(int tamanho){
         this.tamanho = tamanho;
@@ -95,30 +109,74 @@ public class Mapa {
         gerar(3);
     }
     
+    public Player getPlayer ( ) {
+        return player;
+    }
+    
     public void gerar(int percepcaoJogador){
         int numCelulas = tamanho * tamanho;
         int numParedes = random.nextInt(numCelulas - (int) (numCelulas * 0.85))+tamanho;
         
-        CaixaSuprimento.resetarDistribuicao();
-               
-        setCelula(0,0,new Player("Player", 0, 0, 5, percepcaoJogador));   
-        setCelula(tamanho-1, tamanho-1, new TRex(tamanho-1, tamanho-1));
+        player = new Player(0,0, 5, percepcaoJogador);
+        setCelula(0,0, player);   
         
-        while(numParedes > 0){
-            int x = random.nextInt(tamanho);
-            int y = random.nextInt(tamanho);
-
-            if(celulas[x][y] == null){
-                setCelula(x,y,new Entidade("Parede", x, y, '█'));
-                numParedes--;
-            }
-        }
+        alocarParedes(random.nextInt(numCelulas - (int) (numCelulas * 0.85))+tamanho);
         
         alocarDinossauro("Compsognato", 2);
         alocarDinossauro("Velociraptor", 2);
         alocarDinossauro("Troodonte", 5);
-        alocarCaixas(4);
+        alocarDinossauro("TRex", 1);
+        alocarCaixas("MedKit", 1);
+        alocarCaixas("ArmaDeDardos", 2);
+        alocarCaixas("BastaoChoque", 1);
     }
+    
+    private void alocarParedes ( int num ) {
+        for ( int i = 0; i < num; i++ ) {
+            int x = random.nextInt(tamanho);
+            int y = random.nextInt(tamanho);
+            
+            while ( celulas[x][y] != null ) {
+                x = random.nextInt(tamanho);
+                y = random.nextInt(tamanho);
+            }
+
+            Parede parede = new Parede(x, y);
+            paredes.add(parede);
+            setCelula(x,y, parede);
+        }
+    }
+    
+    private void alocarCaixas ( String conteudo, int quantidade ) {
+        CaixaSuprimento caixa;
+        for ( int i = 0; i < quantidade; i++ ) {
+            int x = 0;
+            int y = 0;
+            
+            while ( getCelula(x,y) != null ) {
+                x = random.nextInt(tamanho);
+                y = random.nextInt(tamanho);
+            }
+            
+            switch ( conteudo ) {
+                case "MedKit":
+                    caixa = new CaixaSuprimento(x,y, new KitMedico());
+                    caixas.add(caixa);
+                    setCelula(x,y, caixa);
+                    break;
+                case "ArmaDeDardos":
+                    caixa = new CaixaSuprimento(x,y, new ArmaDeDardos());
+                    caixas.add(caixa);
+                    setCelula(x,y, caixa);
+                    break;
+                case "BastaoChoque":
+                    caixa = new CaixaSuprimento(x,y, new BastaoChoque());
+                    caixas.add(caixa);
+                    setCelula(x,y, caixa);
+                    break;
+            }
+            }
+        }
     
     private void alocarDinossauro(String tipo, int quantidade){
         
@@ -133,49 +191,38 @@ public class Mapa {
             
             switch(tipo){
                 case "Compsognato":
-                    setCelula(x,y,new Compsognato(x,y));
+                    Compsognato compsognato = new Compsognato(x,y);
+                    dinos.add(compsognato);
+                    moveis.add(compsognato);
+                    setCelula(x,y, compsognato);
                     break;
                 case "Velociraptor":
-                    setCelula(x,y,new Velociraptor(x,y));
+                    Velociraptor velociraptor = new Velociraptor(x,y);
+                    dinos.add(velociraptor);
+                    moveis.add(velociraptor);
+                    setCelula(x,y, velociraptor );
                     break;
                 case "Troodonte":
-                    setCelula(x,y,new Troodonte(x,y));
+                    Troodonte troodonte = new Troodonte(x,y);
+                    dinos.add(troodonte);
+                    moveis.add(troodonte);
+                    setCelula(x,y, troodonte );
+                    break;
+                case "TRex":
+                    TRex trex = new TRex(x,y);
+                    dinos.add(trex);
+                    setCelula(x,y, trex);
+                    break;
             }
             
         }
     }
     
-    private void alocarCaixas(int quantidade){
-        for(int i = 0; i < quantidade; i++){
-            int x = 0;
-            int y = 0;
-            
-            while(getCelula(x,y) != null){
-                x = random.nextInt(tamanho);
-                y = random.nextInt(tamanho);
-            }
-            
-            setCelula(x, y, new CaixaSuprimento(x, y));
-        }
-    }
     
     public void atualizarMapa(){
         imprimir();
     }
     
-    public List<Personagem> getPersonagens(){
-        List<Personagem> personagens = new ArrayList<>();
-        
-        for(int i = 0; i < tamanho; i++){
-            for(int j = 0; j < tamanho; j++){
-                if(celulas[i][j] != null && celulas[i][j] instanceof Personagem){
-                    personagens.add((Personagem) celulas[i][j]);
-                }
-            }
-        }
-        
-        return personagens;
-    }
 
     public Entidade moverPlayer(Player player, char direcao){
         int posAlvoX = player.getX();
@@ -211,7 +258,7 @@ public class Mapa {
             return null;
         }
         
-        if(destino instanceof CaixaSuprimento){
+        if(caixas.contains(destino)){
             CaixaSuprimento caixa = (CaixaSuprimento) destino;
             Entidade resultado = abrirCaixa(player, caixa, posAlvoX, posAlvoY);
             if(resultado == null){
@@ -226,24 +273,15 @@ public class Mapa {
     private Entidade abrirCaixa(Player player, CaixaSuprimento caixa, int x, int y){
         System.out.println("Você encontrou uma Caixa de Suprimentos!");
         
-        switch(caixa.getConteudo()){
-            case KIT_MEDICO:
-                player.pegarKitMedico();
-                System.out.println("Você encontrou um Kit Médico!");
-                break;
-            case BASTAO:
-                player.pegarBastao();
-                System.out.println("Você encontrou um Bastão Elétrico!");
-                break;
-            case DARDOS:
-                player.pegarDardo();
-                System.out.println("Você encontrou munição para a Arma de Dardos!");
-                break;
-        }
+        player.getInventario().pegarItem(caixa.getConteudo());
+        System.out.println("Você encontrou " + caixa.getConteudo().getNome());
+        caixas.remove(caixa);
         
         if(caixa.isCompsognatoSurpresa()){
             System.out.println("Surpresa! Um Compsognato estava escondido na caixa!");
             Compsognato comp = new Compsognato(x, y);
+            dinos.add(comp);
+            moveis.add(comp);
             setCelula(x, y, comp);
             return comp;
         }
@@ -252,20 +290,26 @@ public class Mapa {
         return null;
     }
     
+    public boolean isDinossauro ( Entidade entidade ) {
+        return dinos.contains(entidade);
+    }
+    
+    public void matarDinossauro ( Dinossauro dino ) {
+        dinos.remove(dino);
+        if ( moveis.contains(dino) ) {
+            moveis.remove(dino);
+        }
+        setCelula(dino.getX(), dino.getY(), null);
+    }
     
     public int moverDinossauros(Player player, Combate combate){
-        List<Personagem> personagens = getPersonagens();
-        
-        for(Personagem p : personagens){
-            if(!(p instanceof Dinossauro) || p instanceof TRex){
-                continue;
-            }
-            Dinossauro dino = (Dinossauro) p;
+        for(Movel movel : moveis){
+            Dinossauro dino = (Dinossauro) movel;
             if(!dino.estaVivo()){
                 continue;
             }
             
-            int passos = dino.getPassosMovimento();
+            int passos = movel.getPassosMovimento();
             for(int passo = 0; passo < passos; passo++){
                 if(!dino.estaVivo()){
                     break;
@@ -282,13 +326,13 @@ public class Mapa {
                     System.out.println(dino.getNome() + " encontrou o jogador!");
                     int resultado = combate.iniciarCombate(player, dino, this);
                     if(resultado == Combate.VITORIA){
-                        setCelula(dino.getX(), dino.getY(), null);
+                        matarDinossauro(dino);
                     }
                     return resultado;
                 }
                 
                 if(alvoCelula == null){
-                    dino.mover(destino[0], destino[1], this);
+                    movel.mover(destino[0], destino[1], this);
                 }
             }
         }

@@ -1,5 +1,9 @@
 package jogo;
 
+import interfaces.Movel;
+import itens.Arma;
+import itens.Item;
+import java.util.List;
 import personagens.Player;
 import personagens.Dinossauro;
 import personagens.Velociraptor;
@@ -83,52 +87,18 @@ public class Combate {
     }
     
     private void executarAtaqueJogador(Player atacante, Dinossauro alvo, int arma){
-        if(arma == 3){
-            // arma de dardos
-            if(alvo instanceof Velociraptor){
-                System.out.println("Não é possível ferir um Velociraptor com a arma de dardos!");
-                return;
-            }
-            if(!alvo.podeSerAtacadoComDardos()){
-                System.out.println("A arma de dardos não tem efeito sobre " + alvo.getNome() + "!");
-                return;
-            }
-            if(!atacante.usarDardo()){
-                System.out.println("Sem munição de dardos!");
-                return;
-            }
-            System.out.println(atacante.getNome() + " atira um dardo! Crítico!");
-            atacante.atacar(alvo, 2);
-            return;
-        }
-        
-        if(arma == 1 && !alvo.podeSerAtacadoSemArma()){
-            System.out.println("Não é possível ferir " + alvo.getNome() + " com as mãos nuas!");
-            return;
-        }
         
         int resultadoDado = dado.rolar();
         System.out.println(atacante.getNome() + " ataca!\n" + "Resultado do dado: " + resultadoDado);
-        
-        if(arma == 1){
-            if(resultadoDado <= 2){
-                System.out.println("Errou!");
-            } else if (resultadoDado <= 5){
-                System.out.println("Acertou!");
-                atacante.atacar(alvo, 1);
-            } else{
-                System.out.println("Crítico!");
-                atacante.atacar(alvo, 2);
+        if ( arma == 1 ) {
+            atacante.atacarComPunhos(alvo, resultadoDado);
+        } else {
+            if ( atacante.getInventario().getArmas().size() < arma - 2 || arma < 0 ) {
+                throw new IllegalArgumentException("Arma não existe");
             }
-        } else if (arma == 2){
-            if(resultadoDado <= 1){
-                System.out.println("Errou!");
-            }else if (resultadoDado <= 5){
-                System.out.println("Acertou!");
-                atacante.atacar(alvo, 1);
-            }else {
-                System.out.println("Crítico!");
-                atacante.atacar(alvo, 2);
+            atacante.getInventario().getArmas().get(arma - 2).usarArma(alvo, resultadoDado);
+            if ( atacante.getInventario().getArmas().get(arma - 2).isConsumivel() ) {
+                atacante.getInventario().removerArma(atacante.getInventario().getArmas().get(arma - 2));
             }
         }
     }
@@ -157,21 +127,10 @@ public class Combate {
     private int menuEscolhaArma(Player player){
         System.out.println("-".repeat(20) + " ESCOLHA A SUA ARMA " + "-".repeat(20));
         System.out.println("1 - Punhos");
-        
-        if(player.temBastao()){
-            System.out.println("2 - Bastão Elétrico");
+        for ( int i = 0; i < player.getInventario().getArmas().size(); i++ ) {
+            System.out.println( (i + 2) + " - " + player.getInventario().getArmas().get(i).getNome());
         }
-        if(player.temDardos()){
-            System.out.println("3 - Arma de Dardos (munição: " + player.getQuantidadeDardos() + ")");
-        }
-        
         int escolha = lerInteiro();
-        if(escolha == 2 && !player.temBastao()){
-            escolha = 1;
-        }
-        if(escolha == 3 && !player.temDardos()){
-            escolha = 1;
-        }
         return escolha;
     }
     

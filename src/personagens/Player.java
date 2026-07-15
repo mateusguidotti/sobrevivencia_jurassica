@@ -9,8 +9,8 @@ public class Player extends Personagem implements Movel{
     private final int percepcao;
     private final Inventario inventario;
     
-    public Player(String nome, int x, int y, int vida, int percepcao){
-        super(nome, x, y, 'P', vida);
+    public Player(int x, int y, int vida, int percepcao){
+        super("Player", x, y, 'P', vida);
         this.percepcao = percepcao;
         inventario = new Inventario();
     }  
@@ -18,6 +18,25 @@ public class Player extends Personagem implements Movel{
     @Override
     public void atacar(Personagem alvo, int dano){
         alvo.tomarDano(dano);
+    }
+    
+    @Override
+    public int getPassosMovimento ( ) {
+        return 1;
+    }
+    
+    public void atacarComPunhos ( Dinossauro alvo, int dado ) {
+        if ( alvo.podeSerAtacadoSemArma() ) {
+            if ( dado <= 2 ) {
+                System.out.println("Errou ");
+            } else if ( dado <= 5 ) {
+                alvo.tomarDano(1);
+                System.out.println("Acertou ");
+            } else {
+                alvo.tomarDano(2);
+                System.out.println("Acerto crítico! ");
+            }
+        }
     }
     
     @Override
@@ -30,47 +49,11 @@ public class Player extends Personagem implements Movel{
     public int getPercepcao(){
         return this.percepcao;
     }
-    
-    public void pegarBastao(){
-        inventario.setBastao(true);
+
+    public Inventario getInventario() {
+        return inventario;
     }
     
-    public boolean temBastao(){
-        return this.inventario.temBastao();
-    }
-    
-    public void pegarDardo(){
-        inventario.adicionarDardo();
-    }
-    
-    public boolean temDardos(){
-        return inventario.temDardos();
-    }
-    
-    public int getQuantidadeDardos(){
-        return inventario.getDardos();
-    }
-    
-    public boolean usarDardo(){
-        return inventario.usarDardo();
-    }
-    
-    public void pegarKitMedico(){
-        inventario.adicionarKitMedico();
-    }
-    
-    public boolean temKitMedico(){
-        return inventario.temKitMedico();
-    }
-    
-    /** Usa um kit médico do inventário, recuperando pontos de vida. Retorna false se não houver kit. */
-    public boolean usarKitMedico(){
-        if(inventario.usarKitMedico()){
-            curar(3);
-            return true;
-        }
-        return false;
-    }
     
     public boolean esquivar(Dado dado){
         int testePercepcao = dado.rolar(3);
