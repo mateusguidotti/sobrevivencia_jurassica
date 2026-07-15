@@ -311,9 +311,6 @@ public class Mapa {
             
             int passos = movel.getPassosMovimento();
             for(int passo = 0; passo < passos; passo++){
-                if(!dino.estaVivo()){
-                    break;
-                }
                 
                 int[] destino = calcularProximoPasso(dino, player);
                 if(destino == null){

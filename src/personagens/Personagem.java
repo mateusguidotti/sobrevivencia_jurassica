@@ -38,5 +38,5 @@ public abstract class Personagem extends Entidade{
                 "Vida: " + this.vida + "/" + this.vidaMaxima;
     }
       
-    public abstract void atacar(Personagem alvo, int dano);
+
 }

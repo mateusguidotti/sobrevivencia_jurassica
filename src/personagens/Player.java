@@ -15,10 +15,7 @@ public class Player extends Personagem implements Movel{
         inventario = new Inventario();
     }  
     
-    @Override
-    public void atacar(Personagem alvo, int dano){
-        alvo.tomarDano(dano);
-    }
+
     
     @Override
     public int getPassosMovimento ( ) {

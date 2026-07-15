@@ -11,7 +11,6 @@ public abstract class Dinossauro extends Personagem {
         this.id = id;
     }
 
-    @Override
     public void atacar(Personagem alvo, int dano) {
         alvo.tomarDano(dano);
     }
