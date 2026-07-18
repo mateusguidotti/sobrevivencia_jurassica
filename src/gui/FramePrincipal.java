@@ -8,7 +8,10 @@ import personagens.Player;
 
 public class FramePrincipal extends JFrame {
 
-    public FramePrincipal(Mapa mapa, Player jogador) {
+    private final PainelJogo painelJogo;
+    private final PainelHud painelHud;
+
+    public FramePrincipal(JogoFinal jogoFinal, Mapa mapa, Player jogador) {
 
         setTitle("Sobrevivência Jurássica");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -20,14 +23,14 @@ public class FramePrincipal extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-        PainelJogo painelJogo = new PainelJogo(mapa);
+        painelJogo = new PainelJogo(mapa);
 
         gbc.gridx = 0;
         gbc.weightx = 0.7;
 
         add(painelJogo, gbc);
 
-        PainelHud painelHud = new PainelHud(mapa, jogador, painelJogo);
+        painelHud = new PainelHud(jogoFinal, mapa, jogador, painelJogo);
 
         gbc.gridx = 1;
         gbc.weightx = 0.3;
@@ -39,5 +42,13 @@ public class FramePrincipal extends JFrame {
         setLocationRelativeTo(null);
         setResizable(true);
         setVisible(true);
+    }
+
+    public PainelJogo getPainelJogo() {
+        return painelJogo;
+    }
+
+    public PainelHud getPainelHud() {
+        return painelHud;
     }
 }

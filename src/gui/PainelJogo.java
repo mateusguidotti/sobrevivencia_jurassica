@@ -30,6 +30,9 @@ public class PainelJogo extends JPanel {
     private final Image imagemTroodonte;
     private final Image imagemCompsognato;
     private final Image imagemTRex;
+    private final Image imagemOculto;
+
+    private boolean debugAtivo = false;
 
     public PainelJogo(Mapa mapa) {
         this.mapa = mapa;
@@ -43,7 +46,16 @@ public class PainelJogo extends JPanel {
         imagemTroodonte = carregarImagem("troodonte.png");
         imagemCompsognato = carregarImagem("compsognato.png");
         imagemTRex = carregarImagem("t_rex.png");
+        imagemOculto = carregarImagem("oculto.png");
    
+    }
+
+    public void setDebugAtivo(boolean debugAtivo) {
+        this.debugAtivo = debugAtivo;
+    }
+
+    public boolean isDebugAtivo() {
+        return debugAtivo;
     }
 
 
@@ -65,6 +77,7 @@ public class PainelJogo extends JPanel {
         int offsetX = (getWidth() - larguraMapa) / 2;
         int offsetY =(getHeight() - alturaMapa) / 2;
 
+        boolean[][] visivel = debugAtivo ? null : mapa.calcularVisibilidade(mapa.getPlayer());
 
         for (int linha = 0; linha < entidades.length; linha++){
             for (int coluna = 0; coluna < entidades[linha].length; coluna++){
@@ -72,7 +85,8 @@ public class PainelJogo extends JPanel {
                 int x = coluna * tileSize + offsetX;
                 int y = linha * tileSize + offsetY;
 
-                Image imagem = obterImagemDaEntidade(entidade);
+                boolean celulaVisivel = debugAtivo || visivel[linha][coluna];
+                Image imagem = celulaVisivel ? obterImagemDaEntidade(entidade) : imagemOculto;
                 g.drawImage(imagem,x,y,tileSize,tileSize,this);
             }
         }

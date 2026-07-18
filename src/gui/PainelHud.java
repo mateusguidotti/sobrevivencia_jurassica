@@ -13,11 +13,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import itens.Arma;
+import itens.ArmaDeDardos;
+import itens.BastaoChoque;
+import itens.Item;
+import itens.KitMedico;
 import jogo.Mapa;
+import personagens.Dinossauro;
 import personagens.Player;
 
 public class PainelHud extends JPanel {
 
+    private final JogoFinal jogoFinal;
     private final Mapa mapa;
     private final Player jogador;
     private final PainelJogo painelJogo;
@@ -27,16 +34,26 @@ public class PainelHud extends JPanel {
     private JPanel painelControles;
     private JPanel painelStatus;
     private JPanel painelInventario;
+    private JPanel painelDinoStats;
 
     private JLabel lblVida;
     private JLabel lblPercepcao;
     private JLabel lblBastao;
     private JLabel lblDardos;
     private JLabel lblKits;
+    private JLabel lblNomeDino;
+    private JLabel lblVidaDino;
 
     private JTextArea areaLog;
 
-    public PainelHud(Mapa mapa, Player jogador, PainelJogo painelJogo) {
+    private JButton btnCima;
+    private JButton btnBaixo;
+    private JButton btnEsquerda;
+    private JButton btnDireita;
+    private JButton btnDebug;
+
+    public PainelHud(JogoFinal jogoFinal, Mapa mapa, Player jogador, PainelJogo painelJogo) {
+        this.jogoFinal = jogoFinal;
         this.mapa = mapa;
         this.jogador = jogador;
         this.painelJogo = painelJogo;
@@ -59,12 +76,14 @@ public class PainelHud extends JPanel {
     }
 
     private JPanel criarPainelInfo() {
-        JPanel painel = new JPanel(new GridLayout(2,1,5,5));
+        JPanel painel = new JPanel(new GridLayout(3,1,5,5));
 
         painelStatus = criarPainelStatus();
         painelInventario = criarPainelInventario();
+        painelDinoStats = criarPainelDinoStats();
         painel.add(painelStatus);
         painel.add(painelInventario);
+        painel.add(painelDinoStats);
 
         return painel;
     }
@@ -88,13 +107,30 @@ public class PainelHud extends JPanel {
 
         painel.setBorder(BorderFactory.createTitledBorder("Inventário"));
 
-        lblBastao = new JLabel("Bastão Elétrico: Não possui");
-        lblDardos = new JLabel("Dardos: 0");
-        lblKits = new JLabel("Kits Médicos: 0");
+        lblBastao = new JLabel();
+        lblDardos = new JLabel();
+        lblKits = new JLabel();
 
         painel.add(lblBastao);
         painel.add(lblDardos);
         painel.add(lblKits);
+
+        atualizarInventario();
+
+        return painel;
+    }
+
+    private JPanel criarPainelDinoStats() {
+        JPanel painel = new JPanel(new GridLayout(2,1));
+
+        painel.setBorder(BorderFactory.createTitledBorder("Dinossauro em Combate"));
+
+        lblNomeDino = new JLabel();
+        lblVidaDino = new JLabel();
+        painel.add(lblNomeDino);
+        painel.add(lblVidaDino);
+
+        limparDinossauro();
 
         return painel;
     }
@@ -120,15 +156,17 @@ public class PainelHud extends JPanel {
 
         painel.setBorder(BorderFactory.createTitledBorder("Controles"));
 
-        JButton btnCima = new JButton("↑");
-        JButton btnBaixo = new JButton("↓");
-        JButton btnEsquerda = new JButton("←");
-        JButton btnDireita = new JButton("→");
+        btnCima = new JButton("↑");
+        btnBaixo = new JButton("↓");
+        btnEsquerda = new JButton("←");
+        btnDireita = new JButton("→");
+        btnDebug = new JButton("Debug");
 
-        btnCima.addActionListener(e -> moverJogador('w'));
-        btnBaixo.addActionListener(e -> moverJogador('s'));
-        btnEsquerda.addActionListener(e -> moverJogador('a'));
-        btnDireita.addActionListener(e -> moverJogador('d'));
+        btnCima.addActionListener(e -> jogoFinal.moverJogador('w'));
+        btnBaixo.addActionListener(e -> jogoFinal.moverJogador('s'));
+        btnEsquerda.addActionListener(e -> jogoFinal.moverJogador('a'));
+        btnDireita.addActionListener(e -> jogoFinal.moverJogador('d'));
+        btnDebug.addActionListener(e -> jogoFinal.alternarDebug());
 
         GridBagConstraints gbc = new GridBagConstraints();
         
@@ -142,7 +180,7 @@ public class PainelHud extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 1;
-        painel.add(new JButton("•"),gbc);
+        painel.add(btnDebug,gbc);
 
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -155,42 +193,54 @@ public class PainelHud extends JPanel {
         return painel;
     }
 
-    private void moverJogador(char direcao) {
-        mapa.moverPlayer(jogador,direcao);
-        
-        painelJogo.repaint();
-        atualizarStatus();
-        atualizarInventario();
-
-        switch (direcao) {
-            case 'w':
-                adicionarMensagem("Jogador tentou mover-se para cima.");
-                break;
-
-            case 's':
-                adicionarMensagem("Jogador tentou mover-se para baixo.");
-                break;
-
-            case 'a':
-                adicionarMensagem("Jogador tentou mover-se para a esquerda.");
-                break;
-
-            case 'd':
-                adicionarMensagem("Jogador tentou mover-se para a direita.");
-                break;
-        }
-    }
-
     public void atualizarStatus() {
         lblVida.setText("Vida: " + jogador.getVida() + "/" + jogador.getVidaMaxima());
         lblPercepcao.setText("Percepção: " + jogador.getPercepcao());
     }
 
     public void atualizarInventario() {
-        /* Por enquanto os valores são placeholders.*/
-        lblBastao.setText("Bastão Elétrico: Não possui");
-        lblDardos.setText("Dardos: 0");
-        lblKits.setText("Kits Médicos: 0");
+        boolean temBastao = false;
+        int dardos = 0;
+        int kits = 0;
+
+        for (Arma arma : jogador.getInventario().getArmas()) {
+            if (arma instanceof BastaoChoque) {
+                temBastao = true;
+            } else if (arma instanceof ArmaDeDardos) {
+                dardos = arma.getQuantidade();
+            }
+        }
+
+        for (Item item : jogador.getInventario().getInventario()) {
+            if (item instanceof KitMedico) {
+                kits = item.getQuantidade();
+            }
+        }
+
+        lblBastao.setText("Bastão Elétrico: " + (temBastao ? "Possui" : "Não possui"));
+        lblDardos.setText("Dardos: " + dardos);
+        lblKits.setText("Kits Médicos: " + kits);
+    }
+
+    public void atualizarDinossauro(Dinossauro dino) {
+        lblNomeDino.setText("Nome: " + dino.getNome());
+        lblVidaDino.setText("Vida: " + dino.getVida() + "/" + dino.getVidaMaxima());
+    }
+
+    public void limparDinossauro() {
+        lblNomeDino.setText("Nome: -");
+        lblVidaDino.setText("Vida: -/-");
+    }
+
+    public void atualizarTextoDebug(boolean debugAtivo) {
+        btnDebug.setText(debugAtivo ? "Debug: ON" : "Debug");
+    }
+
+    public void desabilitarControles() {
+        btnCima.setEnabled(false);
+        btnBaixo.setEnabled(false);
+        btnEsquerda.setEnabled(false);
+        btnDireita.setEnabled(false);
     }
 
     public void adicionarMensagem(String mensagem) {

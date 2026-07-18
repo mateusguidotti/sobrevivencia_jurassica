@@ -19,9 +19,19 @@ public class Mapa {
     private List<Dinossauro> dinos = new ArrayList<>();
     private List<CaixaSuprimento> caixas = new ArrayList<>();
     private List<Parede> paredes = new ArrayList<>();
+    private String ultimoEvento;
     
     public List<Dinossauro> getListaDinossauros() {
         return dinos;
+    }
+    
+    /* Guarda a última coisa relevante que aconteceu (pegar item, bater na parede, etc)
+       para a interface gráfica poder mostrar no log. Consome o evento ao ler,
+       devolvendo null se nada de novo aconteceu. */
+    public String getUltimoEvento(){
+        String evento = this.ultimoEvento;
+        this.ultimoEvento = null;
+        return evento;
     }
     
     public Mapa(int tamanho){
@@ -66,7 +76,9 @@ public class Mapa {
                 + " | Percepção: " + player.getPercepcao());
     }
     
-    private boolean[][] calcularVisibilidade(Player player){
+    /* Calcula quais células estão visíveis para o jogador, com base na sua percepção.
+       Tornado público para que a interface gráfica também possa usar essa lógica. */
+    public boolean[][] calcularVisibilidade(Player player){
         boolean[][] visivel = new boolean[tamanho][tamanho];
         int px = player.getX();
         int py = player.getY();
@@ -229,6 +241,7 @@ public class Mapa {
     
 
     public Entidade moverPlayer(Player player, char direcao){
+        ultimoEvento = null;
         int posAlvoX = player.getX();
         int posAlvoY = player.getY();
         
@@ -247,11 +260,13 @@ public class Mapa {
                 break;
             default:
                 System.out.println("Escolha inválida");
+                ultimoEvento = "Escolha inválida";
                 return null;
             }
         
         if(posAlvoX < 0 || posAlvoX >= tamanho || posAlvoY < 0 || posAlvoY >= tamanho){
             System.out.println("Não é possível se mover para fora do mapa!");
+            ultimoEvento = "Não é possível se mover para fora do mapa!";
             return null;
         }
         
@@ -271,6 +286,10 @@ public class Mapa {
             return resultado;
         }
         
+        if(destino instanceof Parede){
+            ultimoEvento = "Há uma parede bloqueando o caminho.";
+        }
+        
         return destino;
     }
 
@@ -279,10 +298,12 @@ public class Mapa {
         
         player.getInventario().pegarItem(caixa.getConteudo());
         System.out.println("Você encontrou " + caixa.getConteudo().getNome());
+        ultimoEvento = "Você encontrou uma Caixa de Suprimentos! Item: " + caixa.getConteudo().getNome();
         caixas.remove(caixa);
         
         if(caixa.isCompsognatoSurpresa()){
             System.out.println("Surpresa! Um Compsognato estava escondido na caixa!");
+            ultimoEvento += " -- Surpresa! Um Compsognato estava escondido na caixa!";
             Compsognato comp = new Compsognato(x, y);
             dinos.add(comp);
             moveis.add(comp);
@@ -341,6 +362,41 @@ public class Mapa {
             }
         }
         return -1;
+    }
+    
+    /* Versão usada pela interface gráfica: em vez de resolver o combate sozinha
+       (o que exigiria leitura via Scanner), apenas move os dinossauros e devolve
+       qual deles encontrou o jogador, para que o combate seja tratado pela GUI. */
+    public Dinossauro moverDinossaurosEDetectarColisao(Player player){
+        for(Movel movel : moveis){
+            Dinossauro dino = (Dinossauro) movel;
+            if(!dino.estaVivo()){
+                continue;
+            }
+            
+            int passos = movel.getPassosMovimento();
+            for(int passo = 0; passo < passos; passo++){
+                if(!dino.estaVivo()){
+                    break;
+                }
+                
+                int[] destino = calcularProximoPasso(dino, player);
+                if(destino == null){
+                    continue;
+                }
+                
+                Entidade alvoCelula = getCelula(destino[0], destino[1]);
+                
+                if(alvoCelula == player){
+                    return dino;
+                }
+                
+                if(alvoCelula == null){
+                    movel.mover(destino[0], destino[1], this);
+                }
+            }
+        }
+        return null;
     }
     
     private int[] calcularProximoPasso(Dinossauro dino, Player player){
