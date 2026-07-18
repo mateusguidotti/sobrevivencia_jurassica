@@ -20,11 +20,6 @@ public class FramePrincipal extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-
-        // =========================
-        // PAINEL DO JOGO
-        // =========================
-
         PainelJogo painelJogo = new PainelJogo(mapa);
 
         gbc.gridx = 0;
@@ -32,16 +27,7 @@ public class FramePrincipal extends JFrame {
 
         add(painelJogo, gbc);
 
-
-        // =========================
-        // HUD
-        // =========================
-
-        PainelHud painelHud = new PainelHud(
-                mapa,
-                jogador,
-                painelJogo
-        );
+        PainelHud painelHud = new PainelHud(mapa, jogador, painelJogo);
 
         gbc.gridx = 1;
         gbc.weightx = 0.3;
@@ -50,11 +36,8 @@ public class FramePrincipal extends JFrame {
 
 
         setSize(1000, 700);
-
         setLocationRelativeTo(null);
-
         setResizable(true);
-
         setVisible(true);
     }
 }

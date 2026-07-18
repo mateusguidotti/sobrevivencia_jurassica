@@ -109,39 +109,15 @@ public class PainelJogo extends JPanel {
             return imagemCaixaSuprimento;
         }
 
-        /*
-         * Qualquer entidade que não seja:
-         *
-         * Player
-         * Dinossauro
-         * Parede
-         * CaixaSuprimento
-         *
-         * será desenhada como chão.
-         *
-         * Isso também cobre null.
-         */
-
+        /*se entidade for null retorna a imagem do chão*/
+     
         return imagemChao;
     }
 
 
-    private Image carregarImagem(
-            String nomeArquivo
-    ) {
-
-        String caminho =
-                "./imagens/"
-                        + nomeArquivo;
-
-
-        ImageIcon icone =
-                new ImageIcon(
-                        
-                                caminho
-                        
-                );
-
+    private Image carregarImagem(String nomeArquivo) {
+        String caminho = "./imagens/" + nomeArquivo;
+        ImageIcon icone = new ImageIcon(caminho);
 
         return icone.getImage();
     }
