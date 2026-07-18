@@ -1,13 +1,34 @@
 package personagens;
 
-public abstract class Dinossauro extends Personagem{
-    
-    public Dinossauro(String nome, int x, int y, char simbolo, int vida) {
+import interfaces.Movel;
+import jogo.Mapa;
+
+public abstract class Dinossauro extends Personagem {
+    int id;
+
+    public Dinossauro(String nome, int x, int y, char simbolo, int vida, int id) {
         super(nome, x, y, simbolo, vida);
+        this.id = id;
     }
-    
+
     @Override
-    public void atacar(Personagem alvo, int dano){
-        alvo.tomarDano(1);
+    public void atacar(Personagem alvo, int dano) {
+        alvo.tomarDano(dano);
     }
+
+    
+
+    public boolean podeSerAtacadoSemArma() {
+        return true;
+    }
+
+    public boolean podeSerAtacadoComDardos() {
+        return true;
+    }
+
+
+    public boolean perseguePersonagem() {
+        return false;
+    }
+
 }
