@@ -2,8 +2,6 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
@@ -46,11 +44,8 @@ public class PainelHud extends JPanel {
 
     private JTextArea areaLog;
 
-    private JButton btnCima;
-    private JButton btnBaixo;
-    private JButton btnEsquerda;
-    private JButton btnDireita;
     private JButton btnDebug;
+    private JButton btnCurar;
 
     public PainelHud(JogoFinal jogoFinal, Mapa mapa, Player jogador, PainelJogo painelJogo) {
         this.jogoFinal = jogoFinal;
@@ -152,43 +147,18 @@ public class PainelHud extends JPanel {
     }
 
     private JPanel criarPainelControles() {
-        JPanel painel = new JPanel(new GridBagLayout());
+        JPanel painel = new JPanel(new GridLayout(1,2,5,5));
 
-        painel.setBorder(BorderFactory.createTitledBorder("Controles"));
+        painel.setBorder(BorderFactory.createTitledBorder("Controles (WASD para mover)"));
 
-        btnCima = new JButton("↑");
-        btnBaixo = new JButton("↓");
-        btnEsquerda = new JButton("←");
-        btnDireita = new JButton("→");
         btnDebug = new JButton("Debug");
+        btnCurar = new JButton("Curar");
 
-        btnCima.addActionListener(e -> jogoFinal.moverJogador('w'));
-        btnBaixo.addActionListener(e -> jogoFinal.moverJogador('s'));
-        btnEsquerda.addActionListener(e -> jogoFinal.moverJogador('a'));
-        btnDireita.addActionListener(e -> jogoFinal.moverJogador('d'));
         btnDebug.addActionListener(e -> jogoFinal.alternarDebug());
+        btnCurar.addActionListener(e -> jogoFinal.usarKitMedico());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        painel.add(btnCima,gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        painel.add(btnEsquerda,gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        painel.add(btnDebug,gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        painel.add(btnDireita,gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        painel.add(btnBaixo,gbc);
+        painel.add(btnDebug);
+        painel.add(btnCurar);
 
         return painel;
     }
@@ -237,10 +207,7 @@ public class PainelHud extends JPanel {
     }
 
     public void desabilitarControles() {
-        btnCima.setEnabled(false);
-        btnBaixo.setEnabled(false);
-        btnEsquerda.setEnabled(false);
-        btnDireita.setEnabled(false);
+        btnCurar.setEnabled(false);
     }
 
     public void adicionarMensagem(String mensagem) {

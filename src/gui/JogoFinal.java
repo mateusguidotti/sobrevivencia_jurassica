@@ -102,6 +102,23 @@ public class JogoFinal {
         verificarFimDeJogo();
     }
 
+    /* Chamado pelo botão "Curar" do PainelHud. */
+    public void usarKitMedico() {
+        if (!player.estaVivo()) {
+            return;
+        }
+
+        int indice = player.getInventario().procurarItem(1);
+        if (indice == -1) {
+            frame.getPainelHud().adicionarMensagem("Não há kits médicos no inventário.");
+            return;
+        }
+
+        player.getInventario().getInventario().get(indice).usarItem(player);
+        frame.getPainelHud().adicionarMensagem(player.getNome() + " usou um Kit Médico e recuperou vida.");
+        atualizarHud();
+    }
+
     /* Chamado pelo botão central de controles (antigo botão vazio). */
     public void alternarDebug() {
         debugAtivo = !debugAtivo;
