@@ -1,8 +1,5 @@
 package jogo;
 
-import java.util.List;
-import java.util.Scanner;
-import personagens.*;
 import jogo.CLI;
 
 public class Jogo {

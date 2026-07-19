@@ -1,9 +1,6 @@
 package jogo;
 
 import itens.Item;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Caixa de suprimentos espalhada pelo mapa.

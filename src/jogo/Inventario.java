@@ -4,7 +4,6 @@ import itens.Arma;
 import itens.Item;
 import java.util.ArrayList;
 import java.util.List;
-import personagens.Personagem;
 
 public class Inventario {
     private List<Item> inventario = new ArrayList<>();

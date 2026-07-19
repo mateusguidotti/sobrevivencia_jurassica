@@ -1,8 +1,5 @@
 package personagens;
 
-import interfaces.Movel;
-import jogo.Mapa;
-
 public abstract class Dinossauro extends Personagem {
     int id;
 

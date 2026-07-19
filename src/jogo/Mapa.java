@@ -1,7 +1,6 @@
 package jogo;
 
 import interfaces.Movel;
-import itens.Arma;
 import itens.ArmaDeDardos;
 import itens.BastaoChoque;
 import itens.KitMedico;
