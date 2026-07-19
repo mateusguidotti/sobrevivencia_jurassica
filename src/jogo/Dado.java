@@ -3,12 +3,19 @@ package jogo;
 import java.util.Random;
 
 public class Dado {
+    private static Dado instance;
     private Random random;
     
-    public Dado(){
+    private Dado(){
         this.random = new Random();
     }
-    
+    /* Acesso à instância do Singleton */
+    public static Dado getInstance(){
+        if(instance == null){
+            instance = new Dado();
+        }
+        return instance;
+    }
     /*Rola um dado de N lados*/
     public int rolar(int lados){
         return random.nextInt(lados)+1;

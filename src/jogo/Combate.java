@@ -1,12 +1,8 @@
 package jogo;
 
-import interfaces.Movel;
-import itens.Arma;
-import itens.Item;
-import java.util.List;
+
 import personagens.Player;
 import personagens.Dinossauro;
-import personagens.Velociraptor;
 import java.util.Scanner;
 
 public class Combate {
@@ -20,7 +16,7 @@ public class Combate {
     
     public Combate(){
         scan = new Scanner(System.in);
-        this.dado = new Dado();
+        this.dado = Dado.getInstance();
     }
     
     /**
