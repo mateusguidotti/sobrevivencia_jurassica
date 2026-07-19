@@ -16,7 +16,20 @@ import personagens.Player;
 public class CLI {
     private static final Scanner scan = new Scanner(System.in);
     
-    public static boolean exibirMenuPrincipal(){
+    public static void iniciarJogo(){
+        System.out.println("=================================================");
+        System.out.println("   Bem-vindo a SOBREVIVÊNCIA JURÁSSICA!");
+        System.out.println("=================================================");
+        
+        boolean continuarNoJogo = true;
+        while(continuarNoJogo){
+            continuarNoJogo = exibirMenuPrincipal();
+        }
+        
+        System.out.println("Obrigado por jogar!");
+    }
+    
+    private static boolean exibirMenuPrincipal(){
         System.out.println("\nMenu:");
         System.out.println("1 - Jogar");
         System.out.println("2 - Sair");
