@@ -19,12 +19,7 @@ public class Combate {
         this.dado = Dado.getInstance();
     }
     
-    /**
-     * Inicia um combate entre o jogador e um dinossauro.
-     * O dinossauro desfere o primeiro golpe em cada turno.
-     * Retorna Combate.VITORIA, Combate.DERROTA ou Combate.FUGA.
-     */
-    public int iniciarCombate(Player player, Dinossauro dino, Mapa mapa){
+    public synchronized int iniciarCombate(Player player, Dinossauro dino, Mapa mapa){
         int turno = 1;
         
         while(player.estaVivo() && dino.estaVivo()){

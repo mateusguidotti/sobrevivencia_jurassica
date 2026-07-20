@@ -4,18 +4,13 @@ import java.util.Scanner;
 import personagens.Dinossauro;
 import personagens.Player;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 /**
  *
  * @author dudur
  */
 public class CLI {
     private static final Scanner scan = new Scanner(System.in);
-    
+
     public static void iniciarJogo(){
         System.out.println("=================================================");
         System.out.println("   Bem-vindo a SOBREVIVÊNCIA JURÁSSICA!");
@@ -68,35 +63,31 @@ public class CLI {
         int temp;
         Combate combate = new Combate();
         Mapa mapa = new Mapa(10);
+        MapaListenerCLI listener = new MapaListenerCLI();
+        mapa.addListener(listener);
         mapa.gerar(percepcao);
         Player player = mapa.getPlayer();
-        
+
         System.out.println("-----------------------------------------");
-        
-        boolean debug = false;
+
+        mapa.iniciarThreadsDinossauros(player, combate);
+
         boolean jogoEmAndamento = true;
-        
+
         while(jogoEmAndamento && player.estaVivo() && existemDinossauros(mapa)){
-            mapa.imprimirParaJogador(player, debug);
-            
+            mapa.imprimirParaJogador(player, mapa.isDebug());
+
             System.out.println("\nMenu:");
             System.out.println("1 - Movimentar");
             System.out.println("2 - Cura");
-            System.out.println("3 - DEBUG (" + (debug ? "Desativar" : "Ativar") + ")");
+            System.out.println("3 - DEBUG (" + (mapa.isDebug() ? "Desativar" : "Ativar") + ")");
             System.out.println("4 - Sair");
-            System.out.print("Escolha uma opção: ");
-            
+
             int opcao = lerInteiro();
-            
+
             switch(opcao){
                 case 1:
                     jogoEmAndamento = realizarMovimentacao(mapa, combate, player);
-                    if(jogoEmAndamento && player.estaVivo()){
-                        int resultadoDinos = mapa.moverDinossauros(player, combate);
-                        if(resultadoDinos == Combate.DERROTA){
-                            jogoEmAndamento = false;
-                        }
-                    }
                     break;
                 case 2:
                     temp = player.getInventario().procurarItem(1);
@@ -108,7 +99,7 @@ public class CLI {
                     }
                     break;
                 case 3:
-                    debug = !debug;
+                    mapa.alternarDebug();
                     break;
                 case 4:
                     jogoEmAndamento = false;
@@ -117,7 +108,10 @@ public class CLI {
                     System.out.println("Opção inválida.");
             }
         }
-        
+
+        mapa.pararThreadsDinossauros();
+        listener.encerrar();
+
         exibirResultadoFinal(player, mapa);
     }
     

@@ -7,7 +7,11 @@ import itens.KitMedico;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import personagens.*;
+import interfaces.MapaListener;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Mapa {
     private int tamanho;
@@ -18,6 +22,14 @@ public class Mapa {
     private List<Dinossauro> dinos = new ArrayList<>();
     private List<CaixaSuprimento> caixas = new ArrayList<>();
     private List<Parede> paredes = new ArrayList<>();
+    private volatile boolean debug = false;
+
+    private final List<ThreadDinossauro> threads = new ArrayList<>();
+    private ExecutorService executorDinossauros;
+    private Combate combateAtivo;
+    
+    private final List<MapaListener> listeners = new CopyOnWriteArrayList<>();
+    private final Object lock = new Object(); // trava para operações críticas
     
     public List<Dinossauro> getListaDinossauros() {
         return dinos;
@@ -29,7 +41,7 @@ public class Mapa {
         random = new Random();
     }
     
-    public void imprimir(){
+    public synchronized void imprimir(){
         
         for(int i = 0; i < tamanho; i++){
             for(int j = 0; j < tamanho; j++){
@@ -43,26 +55,28 @@ public class Mapa {
         }
     }
     
-    public void imprimirParaJogador(Player player, boolean debug){
-        boolean[][] visivel = debug ? null : calcularVisibilidade(player);
-        
-        for(int i = 0; i < tamanho; i++){
-            for(int j = 0; j < tamanho; j++){
-                if(debug || visivel[i][j]){
-                    if(celulas[i][j] != null){
-                        System.out.print("| " + celulas[i][j].getSimbolo() + " ");
+    public synchronized void imprimirParaJogador(Player player, boolean debug){
+        synchronized (lock) {
+            boolean[][] visivel = debug ? null : calcularVisibilidade(player);
+            
+            for(int i = 0; i < tamanho; i++){
+                for(int j = 0; j < tamanho; j++){
+                    if(debug || visivel[i][j]){
+                        if(celulas[i][j] != null){
+                            System.out.print("| " + celulas[i][j].getSimbolo() + " ");
+                        } else {
+                            System.out.print("|   ");
+                        }
                     } else {
-                        System.out.print("|   ");
+                        System.out.print("| ? ");
                     }
-                } else {
-                    System.out.print("| ? ");
                 }
+                System.out.print("|\n");
             }
-            System.out.print("|\n");
-        }
         
-        System.out.println(player.getNome() + " - Vida: " + player.getVida() + "/" + player.getVidaMaxima()
+            System.out.println(player.getNome() + " - Vida: " + player.getVida() + "/" + player.getVidaMaxima()
                 + " | Percepção: " + player.getPercepcao());
+        }
     }
     
     private boolean[][] calcularVisibilidade(Player player){
@@ -92,16 +106,47 @@ public class Mapa {
         return visivel;
     }
     
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public void alternarDebug() {
+        this.debug = !this.debug;
+    }
+    
     public int getTamanho(){
         return this.tamanho;
     }
     
-    public Entidade getCelula(int x, int y){
-        return celulas[y][x];
+    public void addListener(MapaListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(MapaListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notificarListeners() {
+        for (MapaListener listener : listeners) {
+            listener.onMapaAtualizado(this);
+        }
     }
     
-    public void setCelula(int x, int y, Entidade entidade){
-        celulas[y][x] = entidade;
+    public Entidade getCelula(int x, int y) {
+        synchronized (lock) {
+            return celulas[y][x];
+        }
+    }
+    
+    public void setCelula(int x, int y, Entidade entidade) {
+        synchronized (lock) {
+            celulas[y][x] = entidade;
+            notificarListeners();
+        }
     }
     
     public void gerar(){
@@ -223,7 +268,7 @@ public class Mapa {
     }
     
 
-    public Entidade moverPlayer(Player player, char direcao){
+    public synchronized Entidade moverPlayer(Player player, char direcao){
         int posAlvoX = player.getX();
         int posAlvoY = player.getY();
         
@@ -282,6 +327,9 @@ public class Mapa {
             dinos.add(comp);
             moveis.add(comp);
             setCelula(x, y, comp);
+            if(executorDinossauros != null){
+                iniciarThread(comp, this.player, combateAtivo);
+            }
             return comp;
         }
         
@@ -293,74 +341,37 @@ public class Mapa {
         return dinos.contains(entidade);
     }
     
-    public void matarDinossauro ( Dinossauro dino ) {
+    public synchronized void matarDinossauro ( Dinossauro dino ) {
         dinos.remove(dino);
         if ( moveis.contains(dino) ) {
             moveis.remove(dino);
         }
         setCelula(dino.getX(), dino.getY(), null);
+
+        threads.stream().filter(thread -> thread.getDino() == dino).forEach(ThreadDinossauro::encerrar);
     }
-    
-    public int moverDinossauros(Player player, Combate combate){
+
+    public void iniciarThreadsDinossauros(Player player, Combate combate){
+        this.combateAtivo = combate;
+        executorDinossauros = Executors.newCachedThreadPool();
         for(Movel movel : moveis){
-            Dinossauro dino = (Dinossauro) movel;
-            if(!dino.estaVivo()){
-                continue;
-            }
-            
-            int passos = movel.getPassosMovimento();
-            for(int passo = 0; passo < passos; passo++){
-                
-                int[] destino = calcularProximoPasso(dino, player);
-                if(destino == null){
-                    continue;
-                }
-                
-                Entidade alvoCelula = getCelula(destino[0], destino[1]);
-                
-                if(alvoCelula == player){
-                    System.out.println(dino.getNome() + " encontrou o jogador!");
-                    int resultado = combate.iniciarCombate(player, dino, this);
-                    if(resultado == Combate.VITORIA){
-                        matarDinossauro(dino);
-                    }
-                    return resultado;
-                }
-                
-                if(alvoCelula == null){
-                    movel.mover(destino[0], destino[1], this);
-                }
-            }
+            iniciarThread(movel, player, combate);
         }
-        return -1;
     }
-    
-    private int[] calcularProximoPasso(Dinossauro dino, Player player){
-        int dx = 0, dy = 0;
-        
-        if(dino.perseguePersonagem()){
-            int diffX = player.getX() - dino.getX();
-            int diffY = player.getY() - dino.getY();
-            if(Math.abs(diffX) > Math.abs(diffY)){
-                dx = Integer.signum(diffX);
-            } else if (diffY != 0){
-                dy = Integer.signum(diffY);
-            } else if (diffX != 0){
-                dx = Integer.signum(diffX);
-            }
-        } else {
-            int[][] direcoes = {{1,0},{-1,0},{0,1},{0,-1}};
-            int[] dir = direcoes[random.nextInt(direcoes.length)];
-            dx = dir[0];
-            dy = dir[1];
+
+    private void iniciarThread(Movel movel, Player player, Combate combate){
+        ThreadDinossauro thread = new ThreadDinossauro(movel, player, this, combate);
+        threads.add(thread);
+        executorDinossauros.submit(thread);
+    }
+
+    public void pararThreadsDinossauros(){
+        for(ThreadDinossauro thread : threads){
+            thread.encerrar();
         }
-        
-        int novoX = dino.getX() + dx;
-        int novoY = dino.getY() + dy;
-        
-        if(novoX < 0 || novoX >= tamanho || novoY < 0 || novoY >= tamanho){
-            return null;
+        if(executorDinossauros != null){
+            executorDinossauros.shutdownNow();
         }
-        return new int[]{novoX, novoY};
+        threads.clear();
     }
 }

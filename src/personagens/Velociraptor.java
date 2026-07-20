@@ -1,11 +1,13 @@
 package personagens;
 
+import estrategias.EstrategiaAleatoria;
 import interfaces.Movel;
 import jogo.Mapa;
 
 public class Velociraptor extends Dinossauro implements Movel{
     public Velociraptor(int x, int y){
         super("Velociraptor", x, y, 'V', 2, 2);
+        setEstrategia(new EstrategiaAleatoria());
     }
     
     @Override

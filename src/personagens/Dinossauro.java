@@ -1,7 +1,10 @@
 package personagens;
 
+import interfaces.EstrategiaMovimento;
+
 public abstract class Dinossauro extends Personagem {
     int id;
+    private EstrategiaMovimento estrategia;
 
     public Dinossauro(String nome, int x, int y, char simbolo, int vida, int id) {
         super(nome, x, y, simbolo, vida);
@@ -25,6 +28,18 @@ public abstract class Dinossauro extends Personagem {
 
     public boolean perseguePersonagem() {
         return false;
+    }
+
+    protected void setEstrategia(EstrategiaMovimento estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    public EstrategiaMovimento getEstrategia() {
+        return estrategia;
+    }
+
+    public long getIntervaloMovimentoMs() {
+        return 10_000;
     }
 
 }

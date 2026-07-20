@@ -1,11 +1,13 @@
 package personagens;
 
+import estrategias.EstrategiaAleatoria;
 import interfaces.Movel;
 import jogo.Mapa;
 
 public class Compsognato extends Dinossauro implements Movel{
     public Compsognato(int x, int y){
         super("Compsognato", x, y, 'C', 1, 1);
+        setEstrategia(new EstrategiaAleatoria());
     }
     
     @Override

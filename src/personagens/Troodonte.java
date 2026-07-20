@@ -1,11 +1,13 @@
 package personagens;
 
+import estrategias.EstrategiaPerseguicao;
 import interfaces.Movel;
 import jogo.Mapa;
 
 public class Troodonte extends Dinossauro implements Movel{
     public Troodonte(int x, int y){
         super("Troodonte", x, y, 'T', 2, 3);
+        setEstrategia(new EstrategiaPerseguicao());
     }
     
     @Override
