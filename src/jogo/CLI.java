@@ -1,5 +1,6 @@
 package jogo;
 
+import gui.FramePrincipal;
 import java.util.Scanner;
 import personagens.Dinossauro;
 import personagens.Player;
@@ -62,12 +63,12 @@ public class CLI {
     private static void jogarPartida(int percepcao){
         int temp;
         Combate combate = new Combate();
-        Mapa mapa = new Mapa(10);
+        Mapa mapa = Mapa.getInstance();
         MapaListenerCLI listener = new MapaListenerCLI();
         mapa.addListener(listener);
         mapa.gerar(percepcao);
         Player player = mapa.getPlayer();
-
+        
         System.out.println("-----------------------------------------");
 
         mapa.iniciarThreadsDinossauros(player, combate);

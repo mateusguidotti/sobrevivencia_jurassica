@@ -1,6 +1,7 @@
-package jogo;
+package jogo.Entidades;
 
 import itens.Item;
+import jogo.Entidade;
 
 /**
  * Caixa de suprimentos espalhada pelo mapa.

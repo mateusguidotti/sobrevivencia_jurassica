@@ -1,5 +1,7 @@
 package jogo;
 
+import jogo.Entidades.CaixaSuprimento;
+import jogo.Entidades.Parede;
 import interfaces.Movel;
 import itens.ArmaDeDardos;
 import itens.BastaoChoque;
@@ -14,6 +16,8 @@ import interfaces.MapaListener;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Mapa {
+    private static Mapa instance;
+    
     private int tamanho;
     private Entidade[][] celulas;
     private Random random;
@@ -35,10 +39,17 @@ public class Mapa {
         return dinos;
     }
     
-    public Mapa(int tamanho){
+    private Mapa(int tamanho){
         this.tamanho = tamanho;
         celulas = new Entidade[tamanho][tamanho];
         random = new Random();
+    }
+    
+    public static Mapa getInstance(){
+        if(instance == null){
+            instance = new Mapa(10);
+        }
+        return instance;
     }
     
     public synchronized void imprimir(){
@@ -139,6 +150,12 @@ public class Mapa {
     public Entidade getCelula(int x, int y) {
         synchronized (lock) {
             return celulas[y][x];
+        }
+    }
+    
+    public Entidade[][] getMapa(){
+        synchronized (lock) {
+            return celulas;
         }
     }
     
