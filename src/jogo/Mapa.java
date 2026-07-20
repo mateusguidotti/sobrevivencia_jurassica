@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import personagens.*;
 import interfaces.MapaListener;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,6 +35,8 @@ public class Mapa {
     
     private final List<MapaListener> listeners = new CopyOnWriteArrayList<>();
     private final Object lock = new Object(); // trava para operações críticas
+
+    private volatile BiConsumer<Integer, Dinossauro> aoEncontrarJogadorListener;
     
     public List<Dinossauro> getListaDinossauros() {
         return dinos;
@@ -146,6 +149,17 @@ public class Mapa {
             listener.onMapaAtualizado(this);
         }
     }
+
+    public void setAoEncontrarJogadorListener(BiConsumer<Integer, Dinossauro> listener) {
+        this.aoEncontrarJogadorListener = listener;
+    }
+
+    void notificarEncontroComJogador(int resultado, Dinossauro dino) {
+        BiConsumer<Integer, Dinossauro> listener = aoEncontrarJogadorListener;
+        if (listener != null) {
+            listener.accept(resultado, dino);
+        }
+    }
     
     public Entidade getCelula(int x, int y) {
         synchronized (lock) {
@@ -174,7 +188,30 @@ public class Mapa {
         return player;
     }
     
+    public synchronized void resetar() {
+        for (int i = 0; i < tamanho; i++) {
+            for (int j = 0; j < tamanho; j++) {
+                celulas[i][j] = null;
+            }
+        }
+
+        pararThreadsDinossauros();
+
+        moveis.clear();
+        dinos.clear();
+        caixas.clear();
+        paredes.clear();
+
+        listeners.clear();
+        aoEncontrarJogadorListener = null;
+
+        player = null;
+        combateAtivo = null;
+    }
+    
     public void gerar(int percepcaoJogador){
+        resetar();
+
         int numCelulas = tamanho * tamanho;
         int numParedes = random.nextInt(numCelulas - (int) (numCelulas * 0.85))+tamanho;
         

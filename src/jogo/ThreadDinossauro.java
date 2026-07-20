@@ -82,6 +82,9 @@ public class ThreadDinossauro implements Runnable {
                 if (alvoCelula == player) {
                     System.out.println("\n" + dino.getNome() + " encontrou o jogador!");
                     int resultado = combate.iniciarCombate(player, dino, mapa);
+
+                    mapa.notificarEncontroComJogador(resultado, dino);
+
                     if (resultado == Combate.VITORIA) {
                         mapa.matarDinossauro(dino);
                     }
