@@ -3,10 +3,23 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/Jogo.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/CLI.java</file>
             <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/Mapa.java</file>
-            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/personagens/Dinossauro.java</file>
-            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/personagens/Player.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/Dado.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/Jogo.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/GUI.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/MapaListenerCLI.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/ThreadDinossauro.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/gui/FramePrincipal.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/gui/PainelJogo.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/gui/PainelHud.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/MapaListenerGUI.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/interfaces/VidaListener.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/interfaces/InventarioListener.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/personagens/Personagem.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/gui/VidaListenerGUI.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/gui/InventarioListenerGUI.java</file>
+            <file>file:/C:/Users/dudur/Downloads/sobrevivencia_jurassica/src/jogo/Inventario.java</file>
         </group>
     </open-files>
 </project-private>

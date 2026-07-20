@@ -61,7 +61,7 @@ public class CLI {
     
     private static void jogarPartida(int percepcao){
         int temp;
-        Combate combate = new Combate();
+        Combate combate = new Combate(new CombateIOConsole());
         Mapa mapa = Mapa.getInstance();
         MapaListenerCLI listener = new MapaListenerCLI();
         mapa.addListener(listener);

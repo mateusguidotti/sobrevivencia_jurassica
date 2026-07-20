@@ -37,16 +37,19 @@ public class PainelHud extends JPanel {
     private JPanel painelControles;
     private JPanel painelStatus;
     private JPanel painelInventario;
+    private JPanel painelDinoStats;
 
     private JLabel lblVida;
     private JLabel lblPercepcao;
     private JLabel lblBastao;
     private JLabel lblDardos;
     private JLabel lblKits;
+    private JLabel lblNomeDino;
+    private JLabel lblVidaDino;
 
     private JTextArea areaLog;
 
-    private JButton btnCima, btnBaixo, btnEsquerda, btnDireita, btnCurar, btnSair;
+    private JButton btnCima, btnBaixo, btnEsquerda, btnDireita, btnCurar, btnDebug, btnSair;
 
     private boolean partidaEncerrada = false;
 
@@ -54,7 +57,7 @@ public class PainelHud extends JPanel {
         this.mapa = mapa;
         this.jogador = jogador;
         this.painelJogo = painelJogo;
-        this.combate = new Combate();
+        this.combate = new Combate(new CombateIOGui(this));
         this.fimDeJogoListener = fimDeJogoListener;
 
         setLayout(new BorderLayout(5, 5));
@@ -80,18 +83,24 @@ public class PainelHud extends JPanel {
         return mapa;
     }
 
+    public Combate getCombate() {
+        return combate;
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(300, 700);
     }
 
     private JPanel criarPainelInfo() {
-        JPanel painel = new JPanel(new GridLayout(2,1,5,5));
+        JPanel painel = new JPanel(new GridLayout(3,1,5,5));
 
         painelStatus = criarPainelStatus();
         painelInventario = criarPainelInventario();
+        painelDinoStats = criarPainelDinoStats();
         painel.add(painelStatus);
         painel.add(painelInventario);
+        painel.add(painelDinoStats);
 
         return painel;
     }
@@ -126,6 +135,21 @@ public class PainelHud extends JPanel {
         return painel;
     }
 
+    private JPanel criarPainelDinoStats() {
+        JPanel painel = new JPanel(new GridLayout(2,1));
+
+        painel.setBorder(BorderFactory.createTitledBorder("Dinossauro em Combate"));
+
+        lblNomeDino = new JLabel();
+        lblVidaDino = new JLabel();
+        painel.add(lblNomeDino);
+        painel.add(lblVidaDino);
+
+        limparDinossauro();
+
+        return painel;
+    }
+
     private JPanel criarPainelLog() {
         JPanel painel = new JPanel(new BorderLayout());
 
@@ -152,6 +176,7 @@ public class PainelHud extends JPanel {
         btnEsquerda = new JButton("←");
         btnDireita = new JButton("→");
         btnCurar = new JButton("Usar Kit Médico");
+        btnDebug = new JButton(mapa.isDebug() ? "Debug: ON" : "Debug");
         btnSair = new JButton("Sair da Partida");
 
         btnCima.addActionListener(e -> moverJogador('w'));
@@ -159,6 +184,7 @@ public class PainelHud extends JPanel {
         btnEsquerda.addActionListener(e -> moverJogador('a'));
         btnDireita.addActionListener(e -> moverJogador('d'));
         btnCurar.addActionListener(e -> usarKitMedico());
+        btnDebug.addActionListener(e -> alternarDebug());
         btnSair.addActionListener(e -> sairDaPartida());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -174,7 +200,7 @@ public class PainelHud extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 1;
-        painel.add(new JButton("•"),gbc);
+        painel.add(btnDebug,gbc);
 
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -205,7 +231,7 @@ public class PainelHud extends JPanel {
 
         if (mapa.isDinossauro(entidade)) {
             Dinossauro dino = (Dinossauro) entidade;
-            adicionarMensagem(dino.getNome() + " estava no caminho! Iniciando combate (veja o console)...");
+            adicionarMensagem(dino.getNome() + " estava no caminho! Iniciando combate...");
 
             int resultado = combate.iniciarCombate(jogador, dino, mapa);
 
@@ -272,6 +298,13 @@ public class PainelHud extends JPanel {
         adicionarMensagem("Kit médico utilizado.");
     }
 
+    /** Alterna a flag de debug centralizada no Mapa (usada também pelo CLI) e repinta o mapa. */
+    private void alternarDebug() {
+        mapa.alternarDebug();
+        btnDebug.setText(mapa.isDebug() ? "Debug: ON" : "Debug");
+        painelJogo.repaint();
+    }
+
     private void sairDaPartida() {
         if (partidaEncerrada) {
             return;
@@ -336,6 +369,16 @@ public class PainelHud extends JPanel {
         lblBastao.setText("Bastão Elétrico: " + (temBastao ? "Possui" : "Não possui"));
         lblDardos.setText("Dardos: " + dardos);
         lblKits.setText("Kits Médicos: " + kits);
+    }
+
+    public void atualizarDinossauro(String nome, int vidaAtual, int vidaMaxima) {
+        lblNomeDino.setText("Nome: " + nome);
+        lblVidaDino.setText("Vida: " + vidaAtual + "/" + vidaMaxima);
+    }
+
+    public void limparDinossauro() {
+        lblNomeDino.setText("Nome: -");
+        lblVidaDino.setText("Vida: -/-");
     }
 
     public void adicionarMensagem(String mensagem) {

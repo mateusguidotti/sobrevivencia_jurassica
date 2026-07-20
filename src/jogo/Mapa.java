@@ -93,31 +93,33 @@ public class Mapa {
         }
     }
     
-    private boolean[][] calcularVisibilidade(Player player){
-        boolean[][] visivel = new boolean[tamanho][tamanho];
-        int px = player.getX();
-        int py = player.getY();
-        visivel[py][px] = true;
-        
-        int alcance = player.getPercepcao();
-        
-        int[][] direcoes = {{1,0},{-1,0},{0,1},{0,-1}};
-        for(int[] dir : direcoes){
-            int x = px;
-            int y = py;
-            for(int passo = 0; passo < alcance; passo++){
-                x += dir[0];
-                y += dir[1];
-                if(x < 0 || x >= tamanho || y < 0 || y >= tamanho){
-                    break;
-                }
-                visivel[y][x] = true;
-                if(celulas[y][x] != null){
-                    break;
+    public boolean[][] calcularVisibilidade(Player player){
+        synchronized (lock) {
+            boolean[][] visivel = new boolean[tamanho][tamanho];
+            int px = player.getX();
+            int py = player.getY();
+            visivel[py][px] = true;
+
+            int alcance = player.getPercepcao();
+
+            int[][] direcoes = {{1,0},{-1,0},{0,1},{0,-1}};
+            for(int[] dir : direcoes){
+                int x = px;
+                int y = py;
+                for(int passo = 0; passo < alcance; passo++){
+                    x += dir[0];
+                    y += dir[1];
+                    if(x < 0 || x >= tamanho || y < 0 || y >= tamanho){
+                        break;
+                    }
+                    visivel[y][x] = true;
+                    if(celulas[y][x] != null){
+                        break;
+                    }
                 }
             }
+            return visivel;
         }
-        return visivel;
     }
     
     public boolean isDebug() {

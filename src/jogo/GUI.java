@@ -65,15 +65,15 @@ public class GUI {
     }
 
     private static void jogarPartida(int percepcao) {
-        Combate combate = new Combate();
         Mapa mapa = Mapa.getInstance();
         mapa.gerar(percepcao); // também limpa o estado da partida anterior
 
         Player player = mapa.getPlayer();
 
-        FramePrincipal.getInstance().iniciarPartida(mapa, player, GUI::exibirResultadoFinal);
+        FramePrincipal frame = FramePrincipal.getInstance();
+        frame.iniciarPartida(mapa, player, GUI::exibirResultadoFinal);
 
-        mapa.iniciarThreadsDinossauros(player, combate);
+        mapa.iniciarThreadsDinossauros(player, frame.getCombate());
     }
 
     private static void exibirResultadoFinal(Mapa mapa, Player player) {

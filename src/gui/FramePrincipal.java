@@ -10,12 +10,16 @@ import java.util.function.BiConsumer;
 
 import javax.swing.JFrame;
 
+import jogo.Combate;
 import jogo.Mapa;
 import personagens.Player;
 
 public class FramePrincipal extends JFrame {
 
     private static FramePrincipal instance;
+
+    private PainelJogo painelJogo;
+    private PainelHud painelHud;
 
     private FramePrincipal() {
         setTitle("Sobrevivência Jurássica");
@@ -57,7 +61,7 @@ public class FramePrincipal extends JFrame {
             }
         });
 
-        PainelJogo painelJogo = new PainelJogo(mapa);
+        painelJogo = new PainelJogo(mapa);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -67,7 +71,7 @@ public class FramePrincipal extends JFrame {
         gbc.weightx = 0.7;
         add(painelJogo, gbc);
 
-        PainelHud painelHud = new PainelHud(mapa, jogador, painelJogo, listenerComFechamento);
+        painelHud = new PainelHud(mapa, jogador, painelJogo, listenerComFechamento);
 
         gbc.gridx = 1;
         gbc.weightx = 0.3;
@@ -76,5 +80,9 @@ public class FramePrincipal extends JFrame {
         revalidate();
         repaint();
         setVisible(true);
+    }
+
+    public Combate getCombate() {
+        return painelHud != null ? painelHud.getCombate() : null;
     }
 }
