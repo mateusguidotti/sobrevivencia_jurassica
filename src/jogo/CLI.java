@@ -1,6 +1,5 @@
 package jogo;
 
-import gui.FramePrincipal;
 import java.util.Scanner;
 import personagens.Dinossauro;
 import personagens.Player;
