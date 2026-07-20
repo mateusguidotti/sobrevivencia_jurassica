@@ -70,6 +70,9 @@ public class PainelHud extends JPanel {
 
         atualizarInventario();
 
+        jogador.addVidaListener(new VidaListenerGUI(this));
+        jogador.getInventario().addInventarioListener(new InventarioListenerGUI(this));
+
         mapa.addListener(new MapaListenerGUI(painelJogo, this, this::aoFimMovimentacaoDinossauros));
     }
 
@@ -164,7 +167,7 @@ public class PainelHud extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         painel.add(btnCima,gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         painel.add(btnEsquerda,gbc);
@@ -221,8 +224,6 @@ public class PainelHud extends JPanel {
         }
 
         painelJogo.repaint();
-        atualizarStatus();
-        atualizarInventario();
 
         if (derrotaImediata || !jogador.estaVivo()) {
             verificarFimDePartida();
@@ -256,7 +257,6 @@ public class PainelHud extends JPanel {
         }
     }
 
-    /** Equivalente à opção "2 - Cura" do menu da CLI. */
     private void usarKitMedico() {
         if (partidaEncerrada) {
             return;
@@ -270,8 +270,6 @@ public class PainelHud extends JPanel {
 
         jogador.getInventario().getInventario().get(indice).usarItem(jogador);
         adicionarMensagem("Kit médico utilizado.");
-        atualizarStatus();
-        atualizarInventario();
     }
 
     private void sairDaPartida() {
@@ -343,7 +341,6 @@ public class PainelHud extends JPanel {
     public void adicionarMensagem(String mensagem) {
         areaLog.append(mensagem + "\n");
 
-        // Faz o scroll ir para a mensagem mais recente
         areaLog.setCaretPosition(areaLog.getDocument().getLength());
     }
 }
