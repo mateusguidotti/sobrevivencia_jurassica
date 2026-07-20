@@ -1,16 +1,21 @@
 package jogo;
 
-public class Entidade {
+import java.awt.Image;
+import java.io.Serializable;
+
+public class Entidade implements Serializable {
     private String nome;
     private int x;
     private int y;
     private char simbolo;
+    private String imagem;
     
-    public Entidade(String nome, int x, int y, char simbolo){
+    public Entidade(String nome, int x, int y, char simbolo, String imagem){
         this.nome = nome;
         this.x = x;
         this.y = y;
         this.simbolo = simbolo;
+        this.imagem = imagem;
     }
     
     public String getNome(){
@@ -33,6 +38,15 @@ public class Entidade {
         this.x = x;
         this.y = y;
     }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+    
     
     
     @Override

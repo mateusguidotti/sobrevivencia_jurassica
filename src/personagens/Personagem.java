@@ -12,8 +12,8 @@ public abstract class Personagem extends Entidade{
 
     private final List<VidaListener> vidaListeners = new CopyOnWriteArrayList<>();
 
-    public Personagem(String nome, int x, int y, char simbolo, int vida){
-        super(nome,x,y,simbolo);
+    public Personagem(String nome, int x, int y, char simbolo, int vida, String imagem){
+        super(nome, x, y, simbolo, imagem);
         this.vida = vida;
         this.vidaMaxima = vida;
     }

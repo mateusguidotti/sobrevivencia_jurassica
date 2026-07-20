@@ -13,7 +13,7 @@ import jogo.Entidade;
 public class Parede extends Entidade {
     
     public Parede(int x, int y) {
-        super("Parede", x, y, '█');
+        super("Parede", x, y, '█', "wall.png");
     }
     
 }

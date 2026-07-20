@@ -22,29 +22,8 @@ public class PainelJogo extends JPanel {
 
     private final Mapa mapa;
 
-    private final Image imagemChao;
-    private final Image imagemParede;
-    private final Image imagemCaixaSuprimento;
-    private final Image imagemPlayer ;
-    private final Image imagemVelociraptor;
-    private final Image imagemTroodonte;
-    private final Image imagemCompsognato;
-    private final Image imagemTRex;
-    private final Image imagemOculto;
-
     public PainelJogo(Mapa mapa) {
         this.mapa = mapa;
-
-        imagemChao = carregarImagem("ground.png");
-
-        imagemParede = carregarImagem("wall.png");
-        imagemCaixaSuprimento = carregarImagem("caixa_suprimentos.png");
-        imagemPlayer = carregarImagem("player.png");
-        imagemVelociraptor = carregarImagem("velociraptor.png");
-        imagemTroodonte = carregarImagem("troodonte.png");
-        imagemCompsognato = carregarImagem("compsognato.png");
-        imagemTRex = carregarImagem("t_rex.png");
-        imagemOculto = carregarImagem("oculto.png");
     }
 
 
@@ -52,7 +31,6 @@ public class PainelJogo extends JPanel {
     public Dimension getPreferredSize() {
         return new Dimension(700,700);
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -76,45 +54,18 @@ public class PainelJogo extends JPanel {
                 int y = linha * tileSize + offsetY;
 
                 boolean celulaVisivel = debugAtivo || visivel[linha][coluna];
-                Image imagem = celulaVisivel ? obterImagemDaEntidade(entidade) : imagemOculto;
+                Image imagem = celulaVisivel ? carregarImagem(obterImagemDaEntidade(entidade)) : carregarImagem("oculto.png");
                 g.drawImage(imagem,x,y,tileSize,tileSize,this);
             }
         }
     }
 
 
-    private Image obterImagemDaEntidade(Entidade entidade) {
-        
-        if (entidade  instanceof Player){
-            return imagemPlayer;
+    private String obterImagemDaEntidade(Entidade entidade) {
+        if (entidade != null) {
+            return entidade.getImagem();
         }
-
-        if (entidade instanceof Velociraptor) {
-            return imagemVelociraptor;
-        }
-        
-        if (entidade instanceof Troodonte) {
-            return imagemTroodonte;
-        }
-
-        if (entidade instanceof Compsognato) {
-            return imagemCompsognato;
-        }
-        
-        if (entidade instanceof TRex) {
-            return imagemTRex;
-        }
-        
-        if (entidade instanceof Parede) {
-            return imagemParede;
-        }
-
-        if (entidade instanceof CaixaSuprimento) {
-            return imagemCaixaSuprimento;
-        }
-
-     
-        return imagemChao;
+        return "ground.png";
     }
 
 

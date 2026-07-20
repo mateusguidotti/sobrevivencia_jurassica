@@ -29,6 +29,7 @@ public class GUI {
 
         if (escolha != 0) {
             JOptionPane.showMessageDialog(null, "Obrigado por jogar!");
+            System.exit(0);
             return;
         }
 
