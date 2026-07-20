@@ -1,5 +1,7 @@
 package personagens;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,7 +12,7 @@ public abstract class Personagem extends Entidade{
     private int vida;
     private final int vidaMaxima;
 
-    private final List<VidaListener> vidaListeners = new CopyOnWriteArrayList<>();
+    private transient List<VidaListener> vidaListeners = new CopyOnWriteArrayList<>();
 
     public Personagem(String nome, int x, int y, char simbolo, int vida, String imagem){
         super(nome, x, y, simbolo, imagem);
@@ -52,6 +54,11 @@ public abstract class Personagem extends Entidade{
         for(VidaListener listener : vidaListeners){
             listener.onVidaAlterada(this, this.vida, this.vidaMaxima);
         }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        vidaListeners = new CopyOnWriteArrayList<>();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package jogo;
 
+import java.io.IOException;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -13,7 +15,7 @@ public class GUI {
     }
 
     private static void exibirMenuPrincipal() {
-        Object[] opcoes = {"Jogar", "Sair"};
+        Object[] opcoes = {"Jogar", "Carregar Partida", "Sair"};
         int escolha = JOptionPane.showOptionDialog(
                 null,
                 "=================================================\n" +
@@ -26,6 +28,11 @@ public class GUI {
                 opcoes,
                 opcoes[0]
         );
+
+        if (escolha == 1) {
+            carregarPartida();
+            return;
+        }
 
         if (escolha != 0) {
             JOptionPane.showMessageDialog(null, "Obrigado por jogar!");
@@ -61,15 +68,41 @@ public class GUI {
             case 2:
                 return 1;
             default:
-                return 3; // Fácil por padrão (inclui janela fechada)
+                return 3;
         }
     }
 
     private static void jogarPartida(int percepcao) {
         Mapa mapa = Mapa.getInstance();
-        mapa.gerar(percepcao); // também limpa o estado da partida anterior
+        mapa.gerar(percepcao);
 
         Player player = mapa.getPlayer();
+
+        FramePrincipal frame = FramePrincipal.getInstance();
+        frame.iniciarPartida(mapa, player, GUI::exibirResultadoFinal);
+
+        mapa.iniciarThreadsDinossauros(player, frame.getCombate());
+    }
+
+    private static void carregarPartida() {
+        try {
+            SaveManager.carregar();
+        } catch (IOException | ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "Não foi possível carregar a partida salva.",
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            exibirMenuPrincipal();
+            return;
+        }
+
+        Mapa mapa = Mapa.getInstance();
+        Player player = mapa.getPlayer();
+
+        if (player == null) {
+            JOptionPane.showMessageDialog(null, "Não há partida salva.",
+                    "Aviso", JOptionPane.WARNING_MESSAGE);
+            exibirMenuPrincipal();
+            return;
+        }
 
         FramePrincipal frame = FramePrincipal.getInstance();
         frame.iniciarPartida(mapa, player, GUI::exibirResultadoFinal);

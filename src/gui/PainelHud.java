@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.function.BiConsumer;
 
 import javax.swing.BorderFactory;
@@ -20,6 +21,7 @@ import itens.Arma;
 import jogo.Combate;
 import jogo.Entidade;
 import jogo.Mapa;
+import jogo.SaveManager;
 import personagens.Dinossauro;
 import personagens.Player;
 
@@ -49,7 +51,7 @@ public class PainelHud extends JPanel {
 
     private JTextArea areaLog;
 
-    private JButton btnCima, btnBaixo, btnEsquerda, btnDireita, btnCurar, btnDebug, btnSair;
+    private JButton btnCima, btnBaixo, btnEsquerda, btnDireita, btnCurar, btnDebug, btnSalvar, btnSair;
 
     private boolean partidaEncerrada = false;
 
@@ -177,6 +179,7 @@ public class PainelHud extends JPanel {
         btnDireita = new JButton("→");
         btnCurar = new JButton("Usar Kit Médico");
         btnDebug = new JButton(mapa.isDebug() ? "Debug: ON" : "Debug");
+        btnSalvar = new JButton("Salvar Partida");
         btnSair = new JButton("Sair da Partida");
 
         btnCima.addActionListener(e -> moverJogador('w'));
@@ -185,6 +188,7 @@ public class PainelHud extends JPanel {
         btnDireita.addActionListener(e -> moverJogador('d'));
         btnCurar.addActionListener(e -> usarKitMedico());
         btnDebug.addActionListener(e -> alternarDebug());
+        btnSalvar.addActionListener(e -> salvarPartida());
         btnSair.addActionListener(e -> sairDaPartida());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -216,6 +220,9 @@ public class PainelHud extends JPanel {
         painel.add(btnCurar, gbc);
 
         gbc.gridy = 4;
+        painel.add(btnSalvar, gbc);
+
+        gbc.gridy = 5;
         painel.add(btnSair, gbc);
 
         return painel;
@@ -298,11 +305,25 @@ public class PainelHud extends JPanel {
         adicionarMensagem("Kit médico utilizado.");
     }
 
-    /** Alterna a flag de debug centralizada no Mapa (usada também pelo CLI) e repinta o mapa. */
     private void alternarDebug() {
         mapa.alternarDebug();
         btnDebug.setText(mapa.isDebug() ? "Debug: ON" : "Debug");
         painelJogo.repaint();
+    }
+
+    private void salvarPartida() {
+        if (partidaEncerrada) {
+            return;
+        }
+
+        try {
+            synchronized (mapa) {
+                SaveManager.salvar(mapa);
+            }
+            adicionarMensagem("Partida salva com sucesso.");
+        } catch (IOException e) {
+            adicionarMensagem("Erro ao salvar a partida: " + e.getMessage());
+        }
     }
 
     private void sairDaPartida() {
@@ -341,6 +362,7 @@ public class PainelHud extends JPanel {
         btnEsquerda.setEnabled(false);
         btnDireita.setEnabled(false);
         btnCurar.setEnabled(false);
+        btnSalvar.setEnabled(false);
         btnSair.setEnabled(false);
     }
 

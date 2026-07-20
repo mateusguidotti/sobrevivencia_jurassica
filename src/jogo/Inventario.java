@@ -3,15 +3,18 @@ package jogo;
 import interfaces.InventarioListener;
 import itens.Arma;
 import itens.Item;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Inventario {
+public class Inventario implements Serializable {
     private List<Item> inventario = new ArrayList<>();
     private List<Arma> armas = new ArrayList<>();
 
-    private final List<InventarioListener> listeners = new CopyOnWriteArrayList<>();
+    private transient List<InventarioListener> listeners = new CopyOnWriteArrayList<>();
 
     public void pegarItem ( Item item ) {
         if ( item.isArma() ) {
@@ -97,5 +100,10 @@ public class Inventario {
         for(InventarioListener listener : listeners){
             listener.onInventarioAlterado();
         }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        listeners = new CopyOnWriteArrayList<>();
     }
 }

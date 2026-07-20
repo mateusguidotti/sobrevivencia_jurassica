@@ -6,6 +6,7 @@ import interfaces.Movel;
 import itens.ArmaDeDardos;
 import itens.BastaoChoque;
 import itens.KitMedico;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -16,7 +17,7 @@ import personagens.*;
 import interfaces.MapaListener;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Mapa {
+public class Mapa implements Serializable {
     private static Mapa instance;
     
     private int tamanho;
@@ -29,14 +30,14 @@ public class Mapa {
     private List<Parede> paredes = new ArrayList<>();
     private volatile boolean debug = false;
 
-    private final List<ThreadDinossauro> threads = new ArrayList<>();
-    private ExecutorService executorDinossauros;
-    private Combate combateAtivo;
+    private final transient List<ThreadDinossauro> threads = new ArrayList<>();
+    private transient ExecutorService executorDinossauros;
+    private transient Combate combateAtivo;
     
-    private final List<MapaListener> listeners = new CopyOnWriteArrayList<>();
-    private final Object lock = new Object(); // trava para operações críticas
+    private final transient List<MapaListener> listeners = new CopyOnWriteArrayList<>();
+    private final transient Object lock = new Object();
 
-    private volatile BiConsumer<Integer, Dinossauro> aoEncontrarJogadorListener;
+    private transient volatile BiConsumer<Integer, Dinossauro> aoEncontrarJogadorListener;
     
     public List<Dinossauro> getListaDinossauros() {
         return dinos;
@@ -210,6 +211,21 @@ public class Mapa {
         player = null;
         combateAtivo = null;
     }
+
+    public synchronized void restaurarEstadoDe(Mapa outro) {
+        resetar();
+
+        this.tamanho = outro.tamanho;
+        this.celulas = outro.celulas;
+        this.player = outro.player;
+        this.moveis = outro.moveis;
+        this.dinos = outro.dinos;
+        this.caixas = outro.caixas;
+        this.paredes = outro.paredes;
+        this.debug = outro.debug;
+
+        notificarListeners();
+    }
     
     public void gerar(int percepcaoJogador){
         resetar();
@@ -236,7 +252,7 @@ public class Mapa {
             int x = random.nextInt(tamanho);
             int y = random.nextInt(tamanho);
             
-            while ( celulas[x][y] != null ) {
+            while ( getCelula(x,y) != null ) {
                 x = random.nextInt(tamanho);
                 y = random.nextInt(tamanho);
             }

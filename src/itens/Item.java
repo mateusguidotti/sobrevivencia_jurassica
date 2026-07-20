@@ -1,16 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package itens;
 
+import java.io.Serializable;
 import personagens.Personagem;
 
-/**
- *
- * @author gpedroso
- */
-public abstract class Item {
+public abstract class Item implements Serializable {
     private int quantidade;
     private boolean consumivel;
     private int id;
