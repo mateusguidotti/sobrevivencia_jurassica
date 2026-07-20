@@ -7,16 +7,9 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import jogo.Entidades.CaixaSuprimento;
 import jogo.Entidade;
 import jogo.Mapa;
-import jogo.Entidades.Parede;
 
-import personagens.Compsognato;
-import personagens.Player;
-import personagens.TRex;
-import personagens.Troodonte;
-import personagens.Velociraptor;
 
 public class PainelJogo extends JPanel {
 
